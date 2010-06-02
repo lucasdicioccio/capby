@@ -1,0 +1,4 @@
+* ability to send train on a capture, in C
+* double check that the blocking/unblocking mode both work fine
+* verify the case where we break from the each loop (with ensure)
+* type checks before doing pointer magic (i.e., might segfault on packet.send_on(crap))

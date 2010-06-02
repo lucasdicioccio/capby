@@ -1,0 +1,81 @@
+
+== About ==
+
+Capby is a C/Ruby wrapper for the libpcap library. It also uses libdnet if
+present on the system.  Capby provides a simple yet powerful interface to sniff
+and inject raw data packets on network interfaces with high time control
+accuracy. Moreover, Capby is portable and should work anywhere where libpcap
+and Ruby both run.
+
+== Usage ==
+
+require 'rubygems' # depends on your install
+require 'capby'
+include Capby
+
+* Listing the devices.
+
+	devices = Device.all
+	devices.each do |dev|
+	  str = d.name
+          str << ' (loopback)' if d.loopback?
+	  str << ": #{d.desc}\n"
+	  puts str
+	end
+
+* Online use (sniffing on a network interface.)
+
+	dev = devices.find{|d| d.name =~ /eth\d+/}
+	cap = LiveCapture.new(dev)
+
+* Offline use (reading a .pcap file.)
+
+	cap = FileCapture.new('capture.pcap')
+
+* Setting a tcpdump filter.
+	
+	cap.filter = 'tcp'
+
+* Setting the direction of the capture.
+
+	cap.direction = :both # or :in, or :out
+
+* Blocking to non-blocking.
+
+	cap.blocking = true # or false
+
+* Sniffing packets.
+
+	# next 10 packets (if in blocking mode)
+	cap.each(10) {|pkt| p pkt}
+
+* Injection.
+
+	pkt = Packet.new("hello world")
+	pkt.data # => "hello world\0x00and folks" # raw string, even with '\0' in it 
+	pkt.before_delay = 100 # wait 100ms before actually sending the packet
+	pkt.after_delay = 100 # wait 100ms after actually sending the packet
+	pkt.send_on(cap)
+
+* More in the examples directory.
+
+== Tested versions and platforms ==
+
+Linux - Ruby 1.9
+Linux - Ruby 1.8
+Win32 - Ruby 1.9
+Win32 - Ruby 1.8
+
+== Installation ==
+
+* Creating the gem.
+	$ rake gem
+	# sudo gem install ./ext/capby-<version>.gem
+
+* Installing manually.
+	$ cd ./ext
+	$ ruby extconf.rb
+	$ make 
+	# make install 
+
+NB: for windows, we ship the binary with the gem, whereas, we do not for linux
