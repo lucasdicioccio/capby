@@ -28,7 +28,7 @@
 #endif
 
 #ifndef CAPBY_VERSION
-        #define CAPBY_VERSION "0.5.3"
+        #define CAPBY_VERSION "0.5.4"
 #endif
 
 #ifndef CAPBY_DEFAULT_BUFLEN
@@ -497,10 +497,14 @@ struct capby_datalink_triolet capby_datalink_mapping[] = {
 __capby_global__ 
 struct __capby_version_record __capby_version_records[] = {
         /* Store at compile time the various library version numbers */
+#ifdef JRUBY
+        {"RUBY_VERSION", "JRuby"},
+#else
 #ifndef RUBY_19
         {"RUBY_VERSION", ruby_version},
 #else
-	{"RUBY_VERSION", "1.9.x"},
+	      {"RUBY_VERSION", "1.9.x"},
+#endif
 #endif
         {"CAPBY_VERSION", CAPBY_VERSION},
         /* {"PCAP_VERSION", pcap_lib_version()}, */ //TODO: perform +/- that

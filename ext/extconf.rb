@@ -37,6 +37,9 @@ else
         have_library("pcap", "pcap_open_live")
 end
 
+if RUBY_PLATFORM =~ /java/
+  $CFLAGS += " -DJRUBY"
+end
 if RUBY_VERSION =~ /1.9/
   $CFLAGS += " -DRUBY_19"
 end
@@ -51,12 +54,16 @@ have_type("struct timespec")
 have_struct_member("struct pcap_stat","bs_capt") 
 have_func("pcap_get_selectable_fd")
 have_func("pcap_set_snaplen")
+have_func("pcap_set_buffer_size")
+have_func("pcap_set_timeout")
 have_func("pcap_setmintocopy")
 have_func("nanosleep")
 have_func("pcap_inject")
 have_func("pcap_next_ex")
 have_func("pcap_sendpacket")
 have_func("pcap_setdirection")
+have_func("rb_thread_wait_fd")
+have_func("rb_equal")
 have_header("dnet.h")
 have_library("dnet", "arp_open")
 

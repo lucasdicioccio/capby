@@ -1,4 +1,5 @@
-* ability to send train on a capture, in C
+* return if sending was successful or not
+* when sending ary of packets, find a way to block when there's an error/raise
 * double check that the blocking/unblocking mode both work fine
 * verify the case where we break from the each loop (with ensure)
-* type checks before doing pointer magic (i.e., might segfault on packet.send_on(crap))
+* type checks before doing pointer magic (i.e., might segfault on packet.send_on(crap), but will reduce the performance => have 2 possible calls)

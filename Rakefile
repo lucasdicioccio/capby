@@ -10,7 +10,7 @@ end
 
 spec = Gem::Specification.new do |s|
   s.name = 'capby'
-  s.version = '0.5.3'
+  s.version = '0.5.4'
   s.platform = Gem::Platform::CURRENT
   s.summary = "Capby is a rubyesque low-level binding to libpcap"
 
