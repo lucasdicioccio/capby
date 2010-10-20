@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'time'
-require 'capby.so'
+require 'capby'
 
 include Capby
 
@@ -19,5 +19,9 @@ dev = Device.all.find {|dev| dev.name == ARGV[0]}
 
 l = LiveCapture.new(dev)
 
-pkts = (0 .. 10).map{|i| Packet.new("a"*1500)}
-pkts.each {|pkt| pkt.send_on(l) }
+p l.methods.sort
+
+pkts = (0 .. 1000).map{|i| Packet.new("a"*1500)}
+#pkts.each {|pkt| pkt.send_on(l) }
+
+l.send_packets!(pkts)

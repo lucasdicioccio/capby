@@ -17,6 +17,10 @@
  * Copyright (c) 2009, Di Cioccio Lucas
  */
 
+#ifndef CAPBY_SOURCE
+#define CAPBY_SOURCE
+
+#include "capby.h"
 #include <ruby.h>
 #include <time.h>
 #include <pcap.h>
@@ -43,13 +47,6 @@
 #include <arpa/inet.h>
 #endif
 
-#ifndef CAPBY_SOURCE
-#define CAPBY_SOURCE
-#endif
-
-#ifndef CAPBY_HEADERS
-#include "capby.h"
-#endif
 
 #ifdef HAVE_DNET_H
 #include <dnet.h>
@@ -80,6 +77,7 @@ static VALUE capby_CAP_set_direction(VALUE, VALUE);
 static VALUE capby_CAP_set_bufsize(VALUE, VALUE);
 static VALUE capby_CAP_set_timeout(VALUE, VALUE);
 static VALUE capby_CAP_set_snaplen(VALUE, VALUE);
+static VALUE capby_CAP_set_immediate_flag(VALUE, VALUE);
 static VALUE capby_CAP_each(int, VALUE *, VALUE);
 static VALUE capby_CAP_get_filter(VALUE);
 static VALUE capby_CAP_set_filter(int, VALUE *, VALUE);
@@ -537,8 +535,8 @@ static VALUE capby_CAP_send_pkts_no_typecheck(VALUE self, VALUE ary)
 
 static VALUE capby_CAP_send_pkt(VALUE self, VALUE rb_pkt)
 {
-    Check_Type(rb_pkt, capby_cPacket);
-    capby_CAP_send_pkt_no_typecheck(self, rb_pkt);
+  Check_Type(rb_pkt, capby_cPacket);
+  capby_CAP_send_pkt_no_typecheck(self, rb_pkt);
 }
 
 static VALUE capby_CAP_send_pkt_no_typecheck(VALUE self, VALUE rb_pkt)
@@ -737,6 +735,34 @@ static VALUE capby_CAP_send_pkt_no_typecheck(VALUE self, VALUE rb_pkt)
       return ms;
 #else
       rb_warn("no pcap_set_timeout");
+      return Qfalse;
+#endif
+    }
+    return Qnil;
+  }
+
+  static VALUE capby_CAP_set_immediate_flag(VALUE self, VALUE flag) 
+  {
+    struct capby_capture * capture = NULL;
+    int val;
+    int ret = 0;
+
+    Data_Get_Struct(self, struct capby_capture, capture);
+    if (capture == NULL) {
+      rb_raise(rb_eRuntimeError, "%s: NULL data pointer", __FUNCTION__);
+    } else {
+#ifdef HAVE_BIOCIMMEDIATE
+      if ((Qfalse == flag) || (Qnil == flag)) {
+        val = 0;
+      } else {
+        val = 1;
+      }
+
+      ret = ioctl(pcap_fileno(capture->ctx), BIOCIMMEDIATE, &val);
+
+      return INT2NUM(ret);
+#else
+      rb_warn("no BIOCIMMEDIATE ioctl");
       return Qfalse;
 #endif
     }
@@ -1243,6 +1269,7 @@ static VALUE capby_CAP_send_pkt_no_typecheck(VALUE self, VALUE rb_pkt)
     rb_define_method(capby_cCapture, "snaplen=", capby_CAP_set_snaplen, 1);
     rb_define_method(capby_cCapture, "bufsize=", capby_CAP_set_bufsize, 1);
     rb_define_method(capby_cCapture, "timeout=", capby_CAP_set_timeout, 1);
+    rb_define_method(capby_cCapture, "immediate!", capby_CAP_set_immediate_flag, 1);
 
     rb_define_singleton_method(capby_cFileCapture, "new", capby_CAP_new_for_file, 1);
     rb_define_method(capby_cLiveCapture, "direction", capby_CAP_get_direction, 0);
@@ -1268,3 +1295,4 @@ static VALUE capby_CAP_send_pkt_no_typecheck(VALUE self, VALUE rb_pkt)
     rb_define_attr(capby_cPacket, "after_delay", 1, 1);
   }
 
+#endif

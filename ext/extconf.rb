@@ -65,6 +65,10 @@ have_func("pcap_setdirection")
 have_func("rb_thread_wait_fd")
 have_func("rb_equal")
 have_header("dnet.h")
+have_header("net/bpf.h")
+if have_macro("BIOCIMMEDIATE", "net/bpf.h")
+        $CFLAGS += " -DHAVE_BIOCIMMEDIATE"
+end
 have_library("dnet", "arp_open")
 
 create_makefile("capby_api")

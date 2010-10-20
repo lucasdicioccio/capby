@@ -17,4 +17,8 @@
 # Copyright (c) 2009, Di Cioccio Lucas
 #
 
-require 'capby_api.so'
+begin
+  require 'capby_api.so'
+rescue LoadError
+  require 'capby_api.bundle'
+end

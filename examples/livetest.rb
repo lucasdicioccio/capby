@@ -20,18 +20,27 @@ dev = Device.all.find {|dev| dev.name == ARGV[0]}
 
 l = LiveCapture.new(dev)
 puts l.datalink
+puts l.filter
+l.filter = ''
+puts l.filter
 
 puts l.instance_variable_get(:@direction)
 
-puts l.direction
-l.direction = :in
-puts l.direction
-l.direction = :out
-puts l.direction
-l.direction = :both
-puts l.direction
+begin
+  puts l.direction
+  l.direction = :in
+  puts l.direction
+  l.direction = :out
+  puts l.direction
+  l.direction = :both
+  puts l.direction
+rescue CapbyError
+  puts "cannot set direction on this platform"
+end
 
-
+puts "set immediate tests"
+puts l.immediate!(true) 
+puts "set blocking tests"
 puts l.blocking?
 l.blocking= false
 puts l.blocking?
@@ -40,16 +49,25 @@ puts l.blocking?
 
 Thread.new do 
   loop do
-    sleep 1
+    sleep 5
     puts "hello from thread: #{Time.now}"
   end
 end
 
+puts "waiting next packet"
 puts l.next.timestamp
 
-enum = Enumerator.new(l, :each, 20)
+begin
+  Enumerator
+rescue NameError
+  include Enumerable
+end
 
-enum.each do |pkt|
-  puts "got #{pkt.data.length} bytes at #{pkt.timestamp}"
+loop do
+  enum = Enumerator.new(l, :each, 20)
+  enum.each do |pkt|
+    puts "got #{pkt.data.length} bytes at #{pkt.timestamp}" if pkt
+  end
+  p l.stats
 end
 

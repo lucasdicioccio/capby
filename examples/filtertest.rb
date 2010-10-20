@@ -22,6 +22,8 @@ l.blocking = true
 
 l.filter = 'tcp'
 
+loop do
 l.each(10) do |pkt|
   p pkt
+end
 end
